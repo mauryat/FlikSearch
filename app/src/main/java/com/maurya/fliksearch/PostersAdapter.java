@@ -31,7 +31,9 @@ public class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.PosterVi
     public void onBindViewHolder(@NonNull PosterViewHolder holder, int position) {
         String posterPath = movies.get(position).getPoster_path();
         String fullPosterPath = "https://image.tmdb.org/t/p/w500" + posterPath;
+
         Picasso.with(holder.posterImageView.getContext()).load(fullPosterPath).into(holder.posterImageView);
+        // add .error() and .placeholder()
     }
 
     @Override

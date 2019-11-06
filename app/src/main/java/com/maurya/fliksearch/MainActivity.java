@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<MovieServiceResponse> call, Throwable t) {
+                // show text or image on page asking user to refresh. May be provide a refresh button.
+                // check if the failure is because of bad request
                 Toast.makeText(MainActivity.this, "Response failure!", Toast.LENGTH_LONG).show();
                 Log.e("API response failure", Objects.requireNonNull(t.getLocalizedMessage()));
             }
