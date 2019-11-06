@@ -2,12 +2,13 @@ package com.maurya.fliksearch;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.maurya.fliksearch.pojo.Movie;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -22,13 +23,15 @@ public class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.PosterVi
     @NonNull
     @Override
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        TextView posterTextView = (TextView) LayoutInflater.from(parent.getContext()).inflate(R.layout.poster, parent, false);
-        return new PosterViewHolder(posterTextView);
+        ImageView posterImageView = (ImageView) LayoutInflater.from(parent.getContext()).inflate(R.layout.poster, parent, false);
+        return new PosterViewHolder(posterImageView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull PosterViewHolder holder, int position) {
-        holder.posterTextView.setText(movies.get(position).getTitle());
+        String posterPath = movies.get(position).getPoster_path();
+        String fullPosterPath = "https://image.tmdb.org/t/p/w500" + posterPath;
+        Picasso.with(holder.posterImageView.getContext()).load(fullPosterPath).into(holder.posterImageView);
     }
 
     @Override
@@ -37,11 +40,11 @@ public class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.PosterVi
     }
 
     class PosterViewHolder extends RecyclerView.ViewHolder {
-        TextView posterTextView;
+        ImageView posterImageView;
 
-        PosterViewHolder(@NonNull TextView textView) {
-            super(textView);
-            posterTextView = textView;
+        PosterViewHolder(@NonNull ImageView imageView) {
+            super(imageView);
+            posterImageView = imageView;
         }
     }
 }

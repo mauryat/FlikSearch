@@ -6,10 +6,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.maurya.fliksearch.pojo.Movie;
 import com.maurya.fliksearch.pojo.MovieServiceResponse;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Objects;
