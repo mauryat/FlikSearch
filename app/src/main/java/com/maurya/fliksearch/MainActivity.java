@@ -41,7 +41,11 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(movieServiceObserver);
     }
 
-    // unsubscribe in ondestroy?
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // unsubscribe rxjava observable
+    }
 
     private class MovieServiceObserver implements Observer<MovieServiceResponse> {
 
