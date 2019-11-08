@@ -56,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onNext(MovieServiceResponse response) {
+            if(response == null) {
+                onError(new Exception("null response!"));
+                return;
+            }
+
             List<Movie> movies = response.getResults();
             assert movies != null;
             postersRecyclerView.setAdapter(new PostersAdapter(movies));
