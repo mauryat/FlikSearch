@@ -4,6 +4,9 @@
 ### Status:
 - Implemented working app
 - Implemented one bonus feature (pagination)
+- Implemented MVP + Dagger approach
+
+Added comments throughout code for helpful understanding and navigation.
 
 ### Build instructions:
 The app was built and tested on Android Studio emulator and device. The development device was Windows. All IDE specific files are in the repo. 
