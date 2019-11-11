@@ -35,12 +35,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        MovieService movieService = ((FlikSearchApplication) getApplication()).getMovieService();
         if(savedInstanceState != null && savedInstanceState.containsKey(PARCELABLE_MODEL)) {
             model = savedInstanceState.getParcelable(PARCELABLE_MODEL);
+            assert model != null;
+            model.reloadDependency(movieService);
         }
 
         if(model == null) {
-            MovieService movieService = ((FlikSearchApplication) getApplication()).getMovieService();
             model = new MainActivityModel(movieService);
         }
 
@@ -61,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putParcelable(PARCELABLE_MODEL, model);
-        super.onSaveInstanceState(outState, outPersistentState);
+        super.onSaveInstanceState(outState);
     }
 }

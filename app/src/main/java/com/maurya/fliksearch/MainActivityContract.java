@@ -25,12 +25,17 @@ public interface MainActivityContract {
 
     interface Model extends Parcelable {
         void fetchMovies();
-        void addObserver(MainActivityContract.ModelObserver modelObserver);
-        void removeObserver();
         void unSubscribeSubscriptions();
+
+        // if movieService is injected using dagger, reload dependency can be used
         void reloadDependency(MovieService movieService);
+
+        // to prevent memory leaks when activity is destroyed
+        void addModelObserver(MainActivityContract.ModelObserver modelObserver);
+        void removeModelObserver();
     }
 
+    // helps ensure model is oblivious to presenter
     interface ModelObserver {
         void onMoviesAvailable(List<Movie> movies);
         void onErrorFetchingMovies(String errorMessage);

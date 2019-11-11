@@ -21,13 +21,13 @@ class MainActivityPresenter implements MainActivityContract.Presenter, MainActiv
     public void start(MainActivityContract.Displayer displayer) {
         this.displayer = displayer;
 
-        model.addObserver(this);
+        model.addModelObserver(this);
         fetchMovies();
     }
 
     @Override
     public void stop() {
-        model.removeObserver();
+        model.removeModelObserver();
         model.unSubscribeSubscriptions();
     }
 
@@ -49,6 +49,7 @@ class MainActivityPresenter implements MainActivityContract.Presenter, MainActiv
 
     @Override
     public void onErrorFetchingMovies(String errorMessage) {
+        // TODO: 11/10/2019 convert to user readable message
         displayer.showErrorMessage(errorMessage);
     }
 }

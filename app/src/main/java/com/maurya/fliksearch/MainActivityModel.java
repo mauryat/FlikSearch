@@ -41,24 +41,30 @@ class MainActivityModel implements MainActivityContract.Model {
     }
 
     @Override
-    public void addObserver(MainActivityContract.ModelObserver modelObserver) {
+    public void addModelObserver(MainActivityContract.ModelObserver modelObserver) {
         this.modelObserver = modelObserver;
     }
 
     @Override
-    public void removeObserver() {
+    public void removeModelObserver() {
         this.modelObserver = null;
     }
 
     @Override
     public void fetchMovies() {
+        assert modelObserver != null;
+
+        if(movies != null) {
+            modelObserver.onMoviesAvailable(movies);
+        }
+
         assert movieService != null; // Use reloadDependency() before making API calls.
         Observable<MovieServiceResponse> moviesObservable = movieService.retrieveMovies();
 
         if(movieServiceObserver != null) {
             // movieService.unsubscribe();
         }
-        assert modelObserver != null;
+
         MovieServiceObserver movieServiceObserver = new MovieServiceObserver(modelObserver);
         moviesObservable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -102,11 +108,6 @@ class MainActivityModel implements MainActivityContract.Model {
         this.movies = movies;
     }
 
-//    private void onFailedToRetrieveData(Throwable e) {
-//        assert modelObserver != null;
-//        modelObserver.onErrorFetchingMovies(e.getLocalizedMessage());
-//    }
-//
     private class MovieServiceObserver implements Observer<MovieServiceResponse> {
 
         @NonNull private MainActivityContract.ModelObserver modelObserver;
