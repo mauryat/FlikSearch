@@ -11,6 +11,7 @@ class MainActivityPresenter implements MainActivityContract.Presenter, MainActiv
     private MainActivityContract.Displayer displayer;
     private MainActivityContract.Model model;
     private MainActivity activity; // can be used to finish activity
+    private boolean loading;
 
     MainActivityPresenter(MainActivityContract.Model model, MainActivity mainActivity) {
         this.model = model;
@@ -22,7 +23,7 @@ class MainActivityPresenter implements MainActivityContract.Presenter, MainActiv
         this.displayer = displayer;
 
         model.addModelObserver(this);
-        fetchMovies();
+        model.fetchMovies(false);
     }
 
     @Override
@@ -32,24 +33,27 @@ class MainActivityPresenter implements MainActivityContract.Presenter, MainActiv
     }
 
     @Override
-    public void fetchMovies() {
-        model.fetchMovies();
-    }
-
-    @Override
-    public void onNextPageRequested() {
+    public void onPageScrolled(int visibleItemCount, int pastVisiblesItems, int totalItemCount) {
         // can be used while implementing pagination
+        if(loading) {
+            if (visibleItemCount + pastVisiblesItems >= totalItemCount) {
+                loading = false;
+                model.fetchMovies(true); // retrieveOffers(offset++, null);
+            }
+        }
     }
 
     /* ModelObserver implementation */
     @Override
     public void onMoviesAvailable(@NonNull List<Movie> movies) {
         displayer.showPosters(movies);
+        loading = true;
     }
 
     @Override
     public void onErrorFetchingMovies(String errorMessage) {
         // TODO: 11/10/2019 convert to user readable message
         displayer.showErrorMessage(errorMessage);
+        loading = true;
     }
 }

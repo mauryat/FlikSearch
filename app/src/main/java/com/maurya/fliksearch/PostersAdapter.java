@@ -41,6 +41,10 @@ public class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.PosterVi
         return movies.size();
     }
 
+    void addMovies(List<Movie> movies) {
+        this.movies.addAll(movies);
+    }
+
     class PosterViewHolder extends RecyclerView.ViewHolder {
         ImageView posterImageView;
 

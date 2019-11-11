@@ -24,6 +24,7 @@ class MainActivityModel implements MainActivityContract.Model {
     static final String PARCELABLE_MODEL = "main_activity_model";
 
     private List<Movie> movies;
+    private int page = 1;
 
     @Nullable
     private MainActivityContract.ModelObserver modelObserver;
@@ -51,15 +52,16 @@ class MainActivityModel implements MainActivityContract.Model {
     }
 
     @Override
-    public void fetchMovies() {
+    public void fetchMovies(boolean nextPage) {
         assert modelObserver != null;
 
-        if(movies != null) {
+        if(movies != null && !nextPage) {
             modelObserver.onMoviesAvailable(movies);
+            return;
         }
 
         assert movieService != null; // Use reloadDependency() before making API calls.
-        Observable<MovieServiceResponse> moviesObservable = movieService.retrieveMovies();
+        Observable<MovieServiceResponse> moviesObservable = movieService.retrieveMovies(page);
 
         if(movieServiceObserver != null) {
             // movieService.unsubscribe();
@@ -85,11 +87,13 @@ class MainActivityModel implements MainActivityContract.Model {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeTypedList(movies);
+        dest.writeTypedList(this.movies);
+        dest.writeInt(this.page);
     }
 
     private MainActivityModel(Parcel in) {
-        movies = in.createTypedArrayList(Movie.CREATOR);
+        this.movies = in.createTypedArrayList(Movie.CREATOR);
+        this.page = in.readInt();
     }
 
     public static final Creator<MainActivityModel> CREATOR = new Creator<MainActivityModel>() {
@@ -130,8 +134,14 @@ class MainActivityModel implements MainActivityContract.Model {
 
             List<Movie> movies = processMovieResponse(response);//response.getResults();
             assert movies != null;
-            MainActivityModel.this.setItems(movies);
+
+            if(MainActivityModel.this.movies == null) {
+                MainActivityModel.this.setItems(movies);
+            } else {
+                MainActivityModel.this.movies.addAll(movies);
+            }
             modelObserver.onMoviesAvailable(MainActivityModel.this.movies);
+            page++;
         }
 
         @Override

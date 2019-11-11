@@ -9,7 +9,6 @@ import java.util.List;
 public interface MainActivityContract {
 
     interface Displayer {
-        //        void displayNextPage();
         void showErrorMessage(String errorMessage);
         void showPosters(List<Movie> movies);
     }
@@ -18,13 +17,12 @@ public interface MainActivityContract {
         void start(Displayer displayer);
         void stop();
 
-        void fetchMovies();
-        void onNextPageRequested();
+        void onPageScrolled(int visibleItemCount, int pastVisibleItems, int totalItemCount);
 //        void onRefreshButtonClicked();
     }
 
     interface Model extends Parcelable {
-        void fetchMovies();
+        void fetchMovies(boolean nextPage);
         void unSubscribeSubscriptions();
 
         // if movieService is injected using dagger, reload dependency can be used

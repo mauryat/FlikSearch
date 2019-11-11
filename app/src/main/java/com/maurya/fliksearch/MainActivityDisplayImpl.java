@@ -2,6 +2,7 @@ package com.maurya.fliksearch;
 
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,16 +32,43 @@ class MainActivityDisplayImpl implements MainActivityContract.Displayer {
 
     @Override
     public void showPosters(List<Movie> movies) {
-        postersRecyclerView.setAdapter(new PostersAdapter(movies));
+        PostersAdapter postersAdapter = (PostersAdapter) postersRecyclerView.getAdapter();
+
+        if(postersAdapter == null) {
+            postersRecyclerView.setAdapter(new PostersAdapter(movies));
+        } else {
+            postersAdapter.addMovies(movies);
+            postersRecyclerView.getAdapter().notifyDataSetChanged();
+        }
     }
 
     private void setupRecyclerView() {
         postersRecyclerView = activity.findViewById(R.id.posters_recycler_view);
         postersRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activity);
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activity);
         postersRecyclerView.setLayoutManager(linearLayoutManager);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(postersRecyclerView.getContext(), linearLayoutManager
                 .getOrientation());
         postersRecyclerView.addItemDecoration(dividerItemDecoration);
+
+        postersRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if(dy > 0) {
+                    int pastVisiblesItems;
+                    int visibleItemCount;
+                    int totalItemCount;
+
+                    visibleItemCount = linearLayoutManager.getChildCount();
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    pastVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition();
+
+                    presenter.onPageScrolled(visibleItemCount, pastVisiblesItems, totalItemCount);
+                }
+            }
+        });
+
     }
 }
