@@ -1,9 +1,11 @@
 package com.maurya.fliksearch;
 
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,63 +22,47 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.maurya.fliksearch.MainActivityModel.PARCELABLE_MODEL;
+
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView postersRecyclerView;
+    private MainActivityContract.Displayer displayer;
+    private MainActivityContract.Presenter presenter;
+    private MainActivityContract.Model model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        postersRecyclerView = findViewById(R.id.posters_recycler_view);
-        postersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        if(savedInstanceState != null && savedInstanceState.containsKey(PARCELABLE_MODEL)) {
+            model = savedInstanceState.getParcelable(PARCELABLE_MODEL);
+        }
 
-        MovieService movieService = ((FlikSearchApplication) getApplication()).getMovieService();
-        Observable<MovieServiceResponse> moviesObservable = movieService.retrieveMovies();
+        if(model == null) {
+            MovieService movieService = ((FlikSearchApplication) getApplication()).getMovieService();
+            model = new MainActivityModel(movieService);
+        }
 
-        MovieServiceObserver movieServiceObserver = new MovieServiceObserver();
-        moviesObservable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(movieServiceObserver);
+        presenter = new MainActivityPresenter(model, this);
+        displayer = new MainActivityDisplayImpl(this, presenter);
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // unsubscribe rxjava observable
+    protected void onStart() {
+        super.onStart();
+        presenter.start(displayer);
     }
 
-    private class MovieServiceObserver implements Observer<MovieServiceResponse> {
+    @Override
+    protected void onStop() {
+        presenter.stop();
+        super.onStop();
+    }
 
-        @Override
-        public void onSubscribe(Disposable d) {
-            // no-op
-        }
-
-        @Override
-        public void onNext(MovieServiceResponse response) {
-            if(response == null) {
-                onError(new Exception("null response!"));
-                return;
-            }
-
-            List<Movie> movies = response.getResults();
-            assert movies != null;
-            postersRecyclerView.setAdapter(new PostersAdapter(movies));
-        }
-
-        @Override
-        public void onError(Throwable e) {
-            // show text or image on page asking user to refresh. May be provide a refresh button.
-            // check if the failure is because of bad request
-            Toast.makeText(MainActivity.this, "Response failure!", Toast.LENGTH_LONG).show();
-            Log.e("API response failure", Objects.requireNonNull(e.getLocalizedMessage()));
-        }
-
-        @Override
-        public void onComplete() {
-            // no-op
-        }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+        outState.putParcelable(PARCELABLE_MODEL, model);
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 }

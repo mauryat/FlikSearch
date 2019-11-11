@@ -1,9 +1,12 @@
 package com.maurya.fliksearch.pojo;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Movie {
+public class Movie implements Parcelable {
     private float popularity;
     private float vote_count;
     private boolean video;
@@ -127,4 +130,60 @@ public class Movie {
     public void setRelease_date(String release_date) {
         this.release_date = release_date;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeFloat(this.popularity);
+        dest.writeFloat(this.vote_count);
+        dest.writeByte(this.video ? (byte) 1 : (byte) 0);
+        dest.writeString(this.poster_path);
+        dest.writeFloat(this.id);
+        dest.writeByte(this.adult ? (byte) 1 : (byte) 0);
+        dest.writeString(this.backdrop_path);
+        dest.writeString(this.original_language);
+        dest.writeString(this.original_title);
+        dest.writeList(this.genre_ids);
+        dest.writeString(this.title);
+        dest.writeFloat(this.vote_average);
+        dest.writeString(this.overview);
+        dest.writeString(this.release_date);
+    }
+
+    public Movie() {
+    }
+
+    protected Movie(Parcel in) {
+        this.popularity = in.readFloat();
+        this.vote_count = in.readFloat();
+        this.video = in.readByte() != 0;
+        this.poster_path = in.readString();
+        this.id = in.readFloat();
+        this.adult = in.readByte() != 0;
+        this.backdrop_path = in.readString();
+        this.original_language = in.readString();
+        this.original_title = in.readString();
+        this.genre_ids = new ArrayList<Integer>();
+        in.readList(this.genre_ids, Integer.class.getClassLoader());
+        this.title = in.readString();
+        this.vote_average = in.readFloat();
+        this.overview = in.readString();
+        this.release_date = in.readString();
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }
