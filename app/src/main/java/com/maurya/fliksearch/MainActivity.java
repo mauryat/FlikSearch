@@ -16,6 +16,8 @@ import com.maurya.fliksearch.pojo.MovieServiceResponse;
 import java.util.List;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -30,12 +32,16 @@ public class MainActivity extends AppCompatActivity {
     private MainActivityContract.Presenter presenter;
     private MainActivityContract.Model model;
 
+    @Inject MovieService movieService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ApplicationComponent applicationComponent = ((FlikSearchApplication) getApplication()).getApplicationComponent();
+        applicationComponent.inject(this);
+
         setContentView(R.layout.activity_main);
 
-        MovieService movieService = ((FlikSearchApplication) getApplication()).getMovieService();
         if(savedInstanceState != null && savedInstanceState.containsKey(PARCELABLE_MODEL)) {
             model = savedInstanceState.getParcelable(PARCELABLE_MODEL);
             assert model != null;
